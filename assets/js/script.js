@@ -1,4 +1,6 @@
 var favList = JSON.parse(localStorage.getItem("favCities")) || [];
+var openMapsApiK = localStorage.getItem("openMaps");
+
 function getIcon(id, hour) {
     if(id > 199 && id < 300){
         return "🌩️";
@@ -19,10 +21,10 @@ function getIcon(id, hour) {
     }
 }
 
-function printData(cityName){
+function printData(cityName, key){
     
-    var currentUrl = "http://api.openweathermap.org/data/2.5/weather?q=" + cityName + ",us&units=imperial&APPID=4ea30a86ce27f7ece8c4b07fb49b8979";
-    var forcastUrl = "http://api.openweathermap.org/data/2.5/forecast?q=" + cityName + ",us&units=imperial&APPID=4ea30a86ce27f7ece8c4b07fb49b8979";
+    var currentUrl = "http://api.openweathermap.org/data/2.5/weather?q=" + cityName + ",us&units=imperial&APPID=" + key;
+    var forcastUrl = "http://api.openweathermap.org/data/2.5/forecast?q=" + cityName + ",us&units=imperial&APPID=" + key;
 
     fetch(currentUrl)
     .then(function(response){
@@ -61,7 +63,6 @@ function printData(cityName){
         }
     })
     .then(function(data){
-        console.log(data);
         var tomorrow = dayjs().unix() + 86400;
         var daysAhead = 1;
         var daysAdded = 0;
@@ -91,7 +92,7 @@ function printData(cityName){
 $("#search-btn").on("click", function(event){
     event.preventDefault();
     var cityName = $("#search-txt").val();
-    printData(cityName);
+    printData(cityName, openMapsApiK);
     $("#search-txt").val("");
 });
 
@@ -115,7 +116,7 @@ function loadFavs(){
 $("#city-favs").on("click", ".city-btn", function(event){
     if($(event.target).attr("class") !== "remove-city"){
         var cityName = $(event.target).attr("data-city");
-        printData(cityName);
+        printData(cityName, openMapsApiK);
     }
 })
 
@@ -137,18 +138,35 @@ loadFavs();
 
 
 
+var availableTags = [
+"ActionScript",
+"AppleScript",
+"Asp",
+"BASIC",
+"C",
+"C++",
+"Clojure",
+"COBOL",
+"ColdFusion",
+"Erlang",
+"Fortran",
+"Groovy",
+"Haskell",
+"Java",
+"JavaScript",
+"Lisp",
+"Perl",
+"PHP",
+"Python",
+"Ruby",
+"Scala",
+"Scheme"
+];
 
 
-
-
-
-
-
-
-
-
-
-
+$("#search-txt").autocomplete({
+source: availableTags
+});
 
 
 
