@@ -1,0 +1,61 @@
+header {
+    background-image: linear-gradient(to right, rgb(42, 42, 221) , rgb(3, 3, 91));
+    color: white;
+    text-align: center;
+    padding: 15px 0;
+    margin: 0 0 20px 0;
+}
+
+header h2 {
+    padding-left: 350px;
+    margin: 0;
+}
+
+
+#current-place {
+    border-width: 5px;
+    border: solid;
+    border-color: black;
+    padding-left: 5px;
+}
+
+#search-txt {
+    width: 100%;
+    padding: 5px;
+    margin-bottom: 10px;
+    border-radius: 5px;
+}
+
+#search-btn {
+    width: 100%
+}
+
+#city-favs button{
+    width: 100%;
+    margin-top: 10px;
+}
+
+
+.custom-card {
+    background: rgb(59, 59, 70);
+    color: white;
+    border-radius: 0;
+    padding: 10px 0 0 10px;
+}
+
+.remove-city {
+    float: left;
+    margin: 0 0 0 10px;
+    padding: 3px;
+    color: red;
+    visibility: hidden;
+}
+
+#city-favs button:hover .remove-city {
+    visibility: visible;
+}
+
+.remove-city:hover{
+    font-weight: 900;
+    color: maroon;
+}
