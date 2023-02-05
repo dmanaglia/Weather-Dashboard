@@ -2,7 +2,6 @@ var favList = JSON.parse(localStorage.getItem("favCities")) || [];
 var openMapsApiK = localStorage.getItem("openMaps");
 var access_token = localStorage.getItem("mapBox")
 
-
 function Location (cityName, lat, lon){
     this.cityName = cityName,
     this.lat = lat,
