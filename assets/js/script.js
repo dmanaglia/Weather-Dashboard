@@ -2,10 +2,12 @@ var favList = JSON.parse(localStorage.getItem("favCities")) || [];
 var openMapsApiK = localStorage.getItem("openMaps");
 var access_token = localStorage.getItem("mapBox")
 
-function Location (cityName, lat, lon){
+function Location (cityName, lat, lon, state, country){
     this.cityName = cityName,
     this.lat = lat,
     this.lon = lon
+    this.state = state,
+    this.country = country
 }
 
 
@@ -29,9 +31,9 @@ function getIcon(id, hour) {
     }
 }
 
-function printData(lat, lon){
-    var currentUrl = "http://api.openweathermap.org/data/2.5/weather?lat=" + lat + "&lon=" + lon + "&units=imperial&APPID=" + openMapsApiK;
-    var forcastUrl = "http://api.openweathermap.org/data/2.5/forecast?lat=" + lat + "&lon=" + lon + "&units=imperial&APPID=" + openMapsApiK;
+function printData(locationObj){
+    var currentUrl = "http://api.openweathermap.org/data/2.5/weather?lat=" + locationObj.lat + "&lon=" + locationObj.lon + "&units=imperial&APPID=" + openMapsApiK;
+    var forcastUrl = "http://api.openweathermap.org/data/2.5/forecast?lat=" + locationObj.lat + "&lon=" + locationObj.lon + "&units=imperial&APPID=" + openMapsApiK;
 
     fetch(currentUrl)
     .then(function(response){
@@ -42,29 +44,29 @@ function printData(lat, lon){
         }
     })
     .then(function(data){
-        console.log(data);
-        $("#current-city-h1").text(data.name + ", " + data.sys.country + " " + getIcon(data.weather[0].id, dayjs().$H));
+        $("#spinner-current").remove();
+        $("#current-city-h1").text(locationObj.cityName + ", " + locationObj.state + ", " + locationObj.country + " " + getIcon(data.weather[0].id, dayjs().$H));
         $("#current-temp").text(data.main.temp);
         $("#current-wind").text(data.wind.speed);
         $("#current-humidity").text(data.main.humidity);
         var found = false;
         for(var i = 0; i < favList.length; i++){
-            if(favList[i].cityName === data.name){
+            if(favList[i].lat === locationObj.lat && favList[i].lon === locationObj.lon){
                 found = true;
             }
         }
         if(!found){
             var addFavEl = $("<button>");
-            addFavEl.text(data.name);
+            addFavEl.text(locationObj.cityName + ", " + locationObj.state);
             addFavEl.attr("class", "btn btn-secondary city-btn");
-            addFavEl.attr("data-city", data.name);
+            addFavEl.attr("data-city", locationObj.lat + "_" + locationObj.lon);
             var deleteEL = $("<p>");
             deleteEL.text("X");
             deleteEL.attr("class", "remove-city");
-            deleteEL.attr("data-city", data.name);
+            deleteEL.attr("data-city", locationObj.lat + "_" + locationObj.lon);
             addFavEl.append(deleteEL);
             $("#city-favs").append(addFavEl);
-            favList.push(new Location(data.name, lat, lon));
+            favList.push(locationObj);
             localStorage.setItem("favCities", JSON.stringify(favList));
         }
 
@@ -77,6 +79,9 @@ function printData(lat, lon){
         }
     })
     .then(function(data){
+        for(var i = 1; i < 6; i++){
+            $("#spinner-future"+i).remove();
+        }
         var tomorrow = dayjs().unix() + 86400;
         var daysAhead = 1;
         var daysAdded = 0;
@@ -103,30 +108,17 @@ function printData(lat, lon){
     })
 }
 
-// function getCords (cityName) {
-//     //ahhhhhh
-// }
-
-// figure out if the search button is worth having
-
-// $("#search-btn").on("click", function(event){
-//     event.preventDefault();
-//     var cityName = $("#search-txt").val();
-//     printData(getCords(cityName));
-//     $("#search-txt").val("");
-// });
-
 function loadFavs(){
     $("#city-favs").empty();
     for(var i = 0; i < favList.length; i++){
         var addFavEl = $("<button>");
-        addFavEl.text(favList[i].cityName);
+        addFavEl.text(favList[i].cityName + ", " + favList[i].state);
         addFavEl.attr("class", "btn btn-secondary city-btn");
-        addFavEl.attr("data-city", favList[i].cityName);
+        addFavEl.attr("data-city", favList[i].lat + "_" + favList[i].lon);
         var deleteEL = $("<p>");
         deleteEL.text("X");
         deleteEL.attr("class", "remove-city");
-        deleteEL.attr("data-city", favList[i].cityName);
+        deleteEL.attr("data-city", favList[i].lat + "_" + favList[i].lon);
         addFavEl.append(deleteEL);
         $("#city-favs").append(addFavEl);
     }
@@ -135,19 +127,20 @@ function loadFavs(){
 
 $("#city-favs").on("click", ".city-btn", function(event){
     if($(event.target).attr("class") !== "remove-city"){
-        var cityName = $(event.target).attr("data-city");
+        var cityCords = $(event.target).attr("data-city");
         for(var i = 0; i < favList.length; i++){
-            if(cityName === favList[i].cityName){
-                printData(favList[i].lat, favList[i].lon);
+            if(cityCords === favList[i].lat + "_" + favList[i].lon){
+                addSpinners();
+                printData(favList[i]);
             }
         }
     }
 })
 
 $("#city-favs").on("click", ".remove-city", function(event){
-    var removeCity = $(event.target).attr("data-city");
+    var cityCords = $(event.target).attr("data-city");
     for(var i = 0; i < favList.length; i++) {
-        if(favList[i].cityName === removeCity) {
+        if(cityCords === favList[i].lat + "_" + favList[i].lon) {
             favList.splice(i, 1);
         }
     }
@@ -155,22 +148,8 @@ $("#city-favs").on("click", ".remove-city", function(event){
     loadFavs();
 })
 
-function getLocation() {
-    if (navigator.geolocation) {
-        navigator.geolocation.getCurrentPosition(showPosition);
-    } else { 
-        alert("Geolocation is not supported by this browser. Search city manually");
-    }
-}
-
-function showPosition(position) {
-    var lat = position.coords.latitude;
-    var lon = position.coords.longitude;
-    printData(lat, lon);
-}
 
 loadFavs();
-getLocation();
 
 $("#search-txt").on("keyup", function(event){
     fetch("https://api.mapbox.com/geocoding/v5/mapbox.places/" + $(event.target).val() + ".json?limit=5&types=place%2Cpostcode%2Clocality%2Cneighborhood&language=en-US&access_token=" + access_token)
@@ -180,18 +159,30 @@ $("#search-txt").on("keyup", function(event){
     .then(function(data){
         var availableTags = [];
         var locations = [];
-
+        
         for(var i = 0; i < data.features.length; i++){
+            var placeInfo = data.features[i].place_name.split(",");
+            var city = placeInfo[0].trim();
+            var state = placeInfo[1].trim();
+            var country = placeInfo[2].trim();
             availableTags.push(data.features[i].place_name);
-            locations.push(new Location(data.features[i].place_name, data.features[i].geometry.coordinates[1], data.features[i].geometry.coordinates[0]));
+            locations.push(new Location(city, data.features[i].geometry.coordinates[1], data.features[i].geometry.coordinates[0], state, country));
         }
-
+        
         $("#search-txt").autocomplete({
+            minLength: 2,
             source: availableTags,
             select: function(event, ui) {
+            var tagInfo = ui.item.label.split(",");
+            var city = tagInfo[0].trim();
+            var state = tagInfo[1].trim();
+            var country = tagInfo[2].trim();
                 for(var i = 0; i < locations.length; i++){
-                    if(ui.item.label === locations[i].cityName){
-                        printData(locations[i].lat, locations[i].lon);
+                    if(city === locations[i].cityName && state === locations[i].state && country === locations[i].country){
+                        addSpinners();
+                        printData(locations[i]);
+                        $(this).val('');
+                        return false;
                     }
                 }
             }
@@ -199,35 +190,40 @@ $("#search-txt").on("keyup", function(event){
     })
 });
 
+function addSpinners(){
+    $("#current-city-h1").text("");
+    $("#current-temp").text("--");
+    $("#current-wind").text("--");
+    $("#current-humidity").text("--");
+    var spinner = $("<div>");
+    spinner.attr("class", "spinner-border");
+    spinner.attr("role", "status");
+    spinner.attr("id", "spinner-current");
+    $("#current-place").prepend(spinner);
+    for(var i = 1; i < 6; i++){
+        $("#future-day"+i).text("");
+        $("#future-day"+i+"-icon").text("--");
+        $("#future-day"+i+"-temp").text("--");
+        $("#future-day"+i+"-wind").text("--");
+        $("#future-day"+i+"-humidity").text("--");
+        var spinner = $("<div>");
+        spinner.attr("class", "spinner-border");
+        spinner.attr("role", "status");
+        spinner.attr("id", "spinner-future"+i);
+        $("#card"+i).prepend(spinner);
+    }
+}
+
 
 // mapboxgl.accessToken = access_token;
 // const geocoder = new MapboxGeocoder({
 // accessToken: mapboxgl.accessToken,
 // types: 'place,postcode,locality,neighborhood'
 // });
- 
 // geocoder.addTo('#geocoder');
- 
-// // Get the geocoder results container.
 // const results = document.getElementById('result');
- 
-// // Add geocoder result to container.
 // geocoder.on('result', (e) => {
 // console.log(e.result);
-
 // });
-
-// ------------------------------------------------------------------------------------------------------------------
-
-// const ACCESS_TOKEN = access_token;
- 
-// const script = document.getElementById('search-js');
-// script.onload = () => {
-//     const collection = mapboxsearch.autofill({
-//         accessToken: ACCESS_TOKEN,
-//         types: 'place,postcode,locality,neighborhood'
-//     });
-// };
-
     
 
