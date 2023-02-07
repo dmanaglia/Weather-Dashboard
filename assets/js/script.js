@@ -133,7 +133,9 @@ $("#city-favs").on("click", ".remove-city", function(event){
 $("#search-txt").on("keyup", function(event){
     fetch("https://api.mapbox.com/geocoding/v5/mapbox.places/" + $(event.target).val() + ".json?limit=5&types=place%2Cpostcode%2Clocality%2Cneighborhood&language=en-US&access_token=" + access_token)
     .then(function(response){
-        return response.json();
+        if(response.ok){
+            return response.json();
+        }
     })
     .then(function(data){
         if(data.features){
