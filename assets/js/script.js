@@ -1,6 +1,6 @@
 var favList = JSON.parse(localStorage.getItem("favCities")) || [];
 var openMapsApiK = "c4569ddf88609f987ce3eae232bd2c96";
-var access_token = "pk.eyJ1IjoiZG1hbmFnbGlhIiwiYSI6ImNsZHFnNHBvajB2M2wzcHA2cmgxODkyOXAifQ.28GfZgfDROlt1vZRPBJvmg"
+var access_token = "pk.eyJ1IjoiZG1hbmFnbGlhIiwiYSI6ImNsZHRtMzE0ZjFxdDAzcHA2MWh2ZjRwOG4ifQ.a6vf0lK-YsPOBxknrJMJSA";
 
 function Location (cityName, lat, lon, state, country){
     this.cityName = cityName,
