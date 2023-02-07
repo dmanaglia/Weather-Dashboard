@@ -31,8 +31,8 @@ function getIcon(id, hour) {
 }
 
 function printData(locationObj){
-    var currentUrl = "http://api.openweathermap.org/data/2.5/weather?lat=" + locationObj.lat + "&lon=" + locationObj.lon + "&units=imperial&APPID=" + openMapsApiK;
-    var forcastUrl = "http://api.openweathermap.org/data/2.5/forecast?lat=" + locationObj.lat + "&lon=" + locationObj.lon + "&units=imperial&APPID=" + openMapsApiK;
+    var currentUrl = "https://api.openweathermap.org/data/2.5/weather?lat=" + locationObj.lat + "&lon=" + locationObj.lon + "&units=imperial&APPID=" + openMapsApiK;
+    var forcastUrl = "https://api.openweathermap.org/data/2.5/forecast?lat=" + locationObj.lat + "&lon=" + locationObj.lon + "&units=imperial&APPID=" + openMapsApiK;
 
     fetch(currentUrl)
     .then(function(response){
