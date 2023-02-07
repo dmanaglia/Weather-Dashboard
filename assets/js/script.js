@@ -171,37 +171,7 @@ $("#search-txt").on("keyup", function(event){
                     }
                 }
             });
-        }    
-        var availableTags = [];
-        var locations = [];
-        
-        for(var i = 0; i < data.features.length; i++){
-            var placeInfo = data.features[i].place_name.split(",");
-            var city = placeInfo[0].trim();
-            var state = placeInfo[1].trim();
-            var country = placeInfo[2].trim();
-            availableTags.push(data.features[i].place_name);
-            locations.push(new Location(city, data.features[i].geometry.coordinates[1], data.features[i].geometry.coordinates[0], state, country));
         }
-        
-        $("#search-txt").autocomplete({
-            minLength: 1,
-            source: availableTags,
-            select: function(event, ui) {
-            var tagInfo = ui.item.label.split(",");
-            var city = tagInfo[0].trim();
-            var state = tagInfo[1].trim();
-            var country = tagInfo[2].trim();
-                for(var i = 0; i < locations.length; i++){
-                    if(city === locations[i].cityName && state === locations[i].state && country === locations[i].country){
-                        addSpinners();
-                        printData(locations[i]);
-                        $(this).val('');
-                        return false;
-                    }
-                }
-            }
-        });
     })
 });
 
