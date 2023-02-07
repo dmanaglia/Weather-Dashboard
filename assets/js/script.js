@@ -1,6 +1,6 @@
 var favList = JSON.parse(localStorage.getItem("favCities")) || [];
-var openMapsApiK = localStorage.getItem("openMaps");
-var access_token = localStorage.getItem("mapBox")
+var openMapsApiK = "c4569ddf88609f987ce3eae232bd2c96";
+var access_token = "pk.eyJ1IjoiZG1hbmFnbGlhIiwiYSI6ImNsZHRtMzE0ZjFxdDAzcHA2MWh2ZjRwOG4ifQ.a6vf0lK-YsPOBxknrJMJSA";
 
 function Location (cityName, lat, lon, state, country){
     this.cityName = cityName,
@@ -9,7 +9,6 @@ function Location (cityName, lat, lon, state, country){
     this.state = state,
     this.country = country
 }
-
 
 function getIcon(id, hour) {
     if(id > 199 && id < 300){
@@ -108,23 +107,6 @@ function printData(locationObj){
     })
 }
 
-function loadFavs(){
-    $("#city-favs").empty();
-    for(var i = 0; i < favList.length; i++){
-        var addFavEl = $("<button>");
-        addFavEl.text(favList[i].cityName + ", " + favList[i].state);
-        addFavEl.attr("class", "btn btn-secondary city-btn");
-        addFavEl.attr("data-city", favList[i].lat + "_" + favList[i].lon);
-        var deleteEL = $("<p>");
-        deleteEL.text("X");
-        deleteEL.attr("class", "remove-city");
-        deleteEL.attr("data-city", favList[i].lat + "_" + favList[i].lon);
-        addFavEl.append(deleteEL);
-        $("#city-favs").append(addFavEl);
-    }
-}
-
-
 $("#city-favs").on("click", ".city-btn", function(event){
     if($(event.target).attr("class") !== "remove-city"){
         var cityCords = $(event.target).attr("data-city");
@@ -147,9 +129,6 @@ $("#city-favs").on("click", ".remove-city", function(event){
     localStorage.setItem("favCities", JSON.stringify(favList));
     loadFavs();
 })
-
-
-loadFavs();
 
 $("#search-txt").on("keyup", function(event){
     fetch("https://api.mapbox.com/geocoding/v5/mapbox.places/" + $(event.target).val() + ".json?limit=5&types=place%2Cpostcode%2Clocality%2Cneighborhood&language=en-US&access_token=" + access_token)
@@ -214,6 +193,23 @@ function addSpinners(){
     }
 }
 
+function loadFavs(){
+    $("#city-favs").empty();
+    for(var i = 0; i < favList.length; i++){
+        var addFavEl = $("<button>");
+        addFavEl.text(favList[i].cityName + ", " + favList[i].state);
+        addFavEl.attr("class", "btn btn-secondary city-btn");
+        addFavEl.attr("data-city", favList[i].lat + "_" + favList[i].lon);
+        var deleteEL = $("<p>");
+        deleteEL.text("X");
+        deleteEL.attr("class", "remove-city");
+        deleteEL.attr("data-city", favList[i].lat + "_" + favList[i].lon);
+        addFavEl.append(deleteEL);
+        $("#city-favs").append(addFavEl);
+    }
+}
+
+loadFavs();
 
 // mapboxgl.accessToken = access_token;
 // const geocoder = new MapboxGeocoder({
