@@ -52,7 +52,7 @@ function printData(locationObj){
         //checks to see if the current city is already in the favorite city list
         var found = false;
         for(var i = 0; i < favList.length; i++){
-            if(favList[i] === locationObj){
+            if(favList[i].lat === locationObj.lat && favList[i].lon === locationObj.lon){
                 found = true;
             }
         }
