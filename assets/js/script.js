@@ -133,7 +133,9 @@ $("#city-favs").on("click", ".remove-city", function(event){
 $("#search-txt").on("keyup", function(event){
     fetch("https://api.mapbox.com/geocoding/v5/mapbox.places/" + $(event.target).val() + ".json?limit=5&types=place%2Cpostcode%2Clocality%2Cneighborhood&language=en-US&access_token=" + access_token)
     .then(function(response){
-        return response.json();
+        if(response.ok){
+            return response.json();
+        }
     })
     .then(function(data){
         var availableTags = [];
@@ -149,7 +151,7 @@ $("#search-txt").on("keyup", function(event){
         }
         
         $("#search-txt").autocomplete({
-            minLength: 2,
+            minLength: 1,
             source: availableTags,
             select: function(event, ui) {
             var tagInfo = ui.item.label.split(",");
